@@ -24,7 +24,8 @@ def extract_text(text, regex):
 @click.option("--output_path", help="Path to the output file")
 @click.option("--verbose", is_flag=True, help="Print the output")
 @click.option("--remove_text", help="Text to remove from the extracted text")
-def pdf_decode(pdf_path, regex, output_path, verbose, remove_text):
+@click.option("--prefix", help="Prefix to add to the extracted text")
+def pdf_decode(pdf_path, regex, output_path, verbose, remove_text, prefix):
     if not os.path.exists(pdf_path):
         print(f"Error: {pdf_path} not found")
         return
@@ -37,12 +38,12 @@ def pdf_decode(pdf_path, regex, output_path, verbose, remove_text):
     if remove_text:
         if verbose:
             print(f"Removing text {remove_text}")
-        matched = [line.replace(remove_text, "") for line in matched]
+        matched = [line.replace(remove_text, "").strip() for line in matched]
 
     if verbose:
         print(f"Writing output to {output_path}")
 
-    output = "\n".join(matched).strip()
+    output = "\n".join(f"{prefix}{line}" for line in matched)
     print(output)
     if output_path:
         with open(output_path, "w") as f:
