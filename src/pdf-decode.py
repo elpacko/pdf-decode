@@ -22,10 +22,13 @@ def extract_text(text, regex):
 @click.option("--pdf_path", required=True, help="Path to the PDF file")
 @click.option("--regex", required=True, help="Regex to extract the text")
 @click.option("--output_path", help="Path to the output file")
+@click.option("--output_batch", is_flag=True, help="Output as script")
 @click.option("--verbose", is_flag=True, help="Print the output")
 @click.option("--remove_text", help="Text to remove from the extracted text")
 @click.option("--prefix", help="Prefix to add to the extracted text")
-def pdf_decode(pdf_path, regex, output_path, verbose, remove_text, prefix):
+def pdf_decode(
+    pdf_path, regex, output_path, output_batch, verbose, remove_text, prefix
+):
     if not os.path.exists(pdf_path):
         print(f"Error: {pdf_path} not found")
         return
@@ -49,6 +52,12 @@ def pdf_decode(pdf_path, regex, output_path, verbose, remove_text, prefix):
         with open(output_path, "w") as f:
             f.write(output)
 
+    if output_batch:
+        with open(output_path, "w") as f:
+            for line in matched:
+                line_witouth_space = re.sub(r"\s+", "_", line)
+                set_line = f"set {prefix or 'Nombre'}={line_witouth_space}"
+                f.write(set_line)
     if verbose:
         print("Done!")
 
